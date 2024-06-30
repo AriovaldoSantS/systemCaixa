@@ -1,18 +1,24 @@
 // src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './components/page/Login';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/page/Home';
+import GerenciarProdutos from './components/page/GerenciarProdutos';
+import Menu from './components/layout/Menu';
+import Login from './components/page/Login';
+import ThemeProvider from './ThemeProvider';
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Menu />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/gerenciar-produtos" element={<GerenciarProdutos />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 

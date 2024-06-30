@@ -1,5 +1,4 @@
 // database.js
-
 const sqlite3 = require('sqlite3').verbose();
 
 // Cria ou conecta ao banco de dados SQLite

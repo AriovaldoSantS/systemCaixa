@@ -1,5 +1,4 @@
 // ListarProdutos.js
-
 const db = require('./database'); // Caminho para o arquivo database.js
 
 const listarProdutos = () => {

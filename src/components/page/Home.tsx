@@ -1,75 +1,47 @@
-// src/components/page/Home.tsx
-import React, { useState } from 'react';
-import { Container, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, Button, Grid } from '@mui/material';
+import React from 'react';
+import { Container, Typography, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 import RegistrarVendaModal from '../modal/RegistrarVendaModal';
-import CadastroProdutoModal from '../modal/CadastroProdutoModal';
+import { Produto } from '../types/Produto';
+import { Venda } from '../types/Venda';
+import { getVendas } from '../../services/storageService'; // Importar função para obter vendas do serviço de armazenamento
 
-interface Produto {
-  nome: string;
-  valorUnitario: number;
-}
+const Home: React.FC = () => {
+  const [produtos, setProdutos] = React.useState<Produto[]>([]);
+  const [vendas, setVendas] = React.useState<Venda[]>([]);
+  const [modalOpen, setModalOpen] = React.useState(false);
 
-interface Venda {
-  nomeProduto: string;
-  quantidade: number;
-  desconto: number;
-}
+  React.useEffect(() => {
+    // Carregar produtos e vendas ao montar o componente
+    const storedProdutos = JSON.parse(localStorage.getItem('produtos') || '[]');
+    setProdutos(storedProdutos);
 
-const Home = () => {
-  const [produtos, setProdutos] = useState<Produto[]>(() => {
-    return JSON.parse(localStorage.getItem('produtos') || '[]');
-  });
+    const storedVendas = getVendas();
+    setVendas(storedVendas);
+  }, []);
 
-  const [vendas, setVendas] = useState<Venda[]>(() => {
-    return JSON.parse(localStorage.getItem('vendas') || '[]');
-  });
-
-  const [openRegistrarVenda, setOpenRegistrarVenda] = useState(false);
-  const [openCadastroProduto, setOpenCadastroProduto] = useState(false);
-
-  const handleRegistrarVenda = (novaVenda: Venda[]) => {
-    const novasVendas = [...vendas, ...novaVenda];
-    localStorage.setItem('vendas', JSON.stringify(novasVendas));
-    setVendas(novasVendas);
+  const handleRegistrarVenda = (novaVenda: Omit<Venda, 'id'>[]) => {
+    // Atualizar vendas no estado e persistir
+    const atualizadasVendas = [
+      ...vendas,
+      ...novaVenda.map(venda => ({
+        ...venda,
+        id: Math.random().toString(36).substr(2, 9) // Geração de ID aleatório
+      }))
+    ];
+    localStorage.setItem('vendas', JSON.stringify(atualizadasVendas));
+    setVendas(atualizadasVendas);
   };
-
-  const handleCadastrarProduto = (novoProduto: Produto) => {
-    const produtosAtualizados = [...produtos, novoProduto];
-    localStorage.setItem('produtos', JSON.stringify(produtosAtualizados));
-    setProdutos(produtosAtualizados);
-  };
-
-  const vendasAgrupadas = vendas.reduce<{ [key: string]: { quantidade: number; total: number } }>((acc, venda) => {
-    if (!acc[venda.nomeProduto]) {
-      acc[venda.nomeProduto] = { quantidade: 0, total: 0 };
-    }
-    const produto = produtos.find(produto => produto.nome === venda.nomeProduto);
-    if (produto) {
-      acc[venda.nomeProduto].quantidade += venda.quantidade;
-      acc[venda.nomeProduto].total += (venda.quantidade * produto.valorUnitario - venda.desconto);
-    }
-    return acc;
-  }, {});
-
-  const totalVendas = Object.values(vendasAgrupadas).reduce((acc, venda) => acc + venda.total, 0);
 
   return (
-    <Container>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         Home
       </Typography>
-      <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-        <Grid item>
-          <Button variant="contained" color="primary" onClick={() => setOpenCadastroProduto(true)}>
-            Cadastrar Produto
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button variant="contained" color="primary" onClick={() => setOpenRegistrarVenda(true)}>
-            Registrar Venda
-          </Button>
-        </Grid>
-      </Grid>
+      
+      <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={() => setModalOpen(true)}>
+        Registrar Venda
+      </Button>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -80,29 +52,22 @@ const Home = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.entries(vendasAgrupadas).map(([nomeProduto, { quantidade, total }]) => (
-              <TableRow key={nomeProduto}>
-                <TableCell>{nomeProduto}</TableCell>
-                <TableCell align="right">{quantidade}</TableCell>
-                <TableCell align="right">{total.toFixed(2)}</TableCell>
+            {produtos.map((produto) => (
+              <TableRow key={produto.id}>
+                <TableCell>{produto.nome}</TableCell>
+                <TableCell align="right">{/* Exibir a quantidade vendida deste produto */}</TableCell>
+                <TableCell align="right">{/* Calcular e exibir o total vendido deste produto */}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Typography variant="h6" sx={{ marginTop: 2 }}>
-        Total do Dia: R$ {totalVendas.toFixed(2)}
-      </Typography>
+
       <RegistrarVendaModal
-        open={openRegistrarVenda}
-        onClose={() => setOpenRegistrarVenda(false)}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
         produtos={produtos}
         onRegistrarVenda={handleRegistrarVenda}
-      />
-      <CadastroProdutoModal
-        open={openCadastroProduto}
-        onClose={() => setOpenCadastroProduto(false)}
-        onCadastrarProduto={handleCadastrarProduto}
       />
     </Container>
   );
