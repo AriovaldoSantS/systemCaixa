@@ -1,9 +1,9 @@
+import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React from 'react';
-import { Container, Typography, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
-import RegistrarVendaModal from '../modal/RegistrarVendaModal';
-import { Produto } from '../types/Produto';
-import { Venda } from '../types/Venda';
-import { getVendas } from '../../services/storageService'; // Importar função para obter vendas do serviço de armazenamento
+import RegistrarVendaModal from '../components/modal/RegistrarVendaModal';
+import { Produto } from '../components/types/Produto';
+import { Venda } from '../components/types/Venda';
+import { getVendas } from '../services/storageService'; // Importar função para obter vendas do serviço de armazenamento
 
 const Home: React.FC = () => {
   const [produtos, setProdutos] = React.useState<Produto[]>([]);

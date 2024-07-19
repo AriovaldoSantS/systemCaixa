@@ -1,7 +1,7 @@
+import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { Container, Typography, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
-import CadastroProdutoModal from '../modal/CadastroProdutoModal';
-import { Produto } from '../types/Produto';
+import CadastroProdutoModal from '../components/modal/CadastroProdutoModal';
+import { Produto } from '../components/types/Produto';
 
 const GerenciarProdutos: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
